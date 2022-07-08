@@ -175,7 +175,7 @@ function Header() {
           onClick={() => go({ type: NavEnum.Jeos })}
           className="header-button"
         >
-          JEOPARDY
+          JEOPARTY
         </button>
       </div>
       <div
