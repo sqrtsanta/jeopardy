@@ -40,7 +40,7 @@
   cursor: pointer;
   color: var(--gold-color);
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 700;
   text-align: center;
   position: relative;
 }
@@ -51,6 +51,7 @@
 }
 
 .jeo-item__ts {
+  font-weight: 400;
   font-size: 12px;
   position: absolute;
   bottom: 8px;
@@ -64,7 +65,7 @@
   flex-grow: 1;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: 0.7fr repeat(5, 1fr);
+  grid-template-rows: 0.7fr 0.7fr repeat(5, 1fr);
   gap: 8px;
   padding: 8px;
 }
@@ -84,6 +85,15 @@
   min-height: 0;
 }
 
+.jeo-cell--title {
+  grid-column: 1 / -1;
+  cursor: revert;
+}
+
+.jeo-cell--header {
+  cursor: revert;
+}
+
 .jeo-cell--active {
   border: 2px solid var(--gold-color);
   border-radius: 4px;
@@ -95,11 +105,8 @@
   color: transparent;
 }
 
-.jeo-cell__tiny {
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  font-size: 12px;
+.jeo-cell--empty {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .form {
@@ -160,6 +167,11 @@
 .button--delete {
   background: var(--red-color);
   color: white;
+}
+
+.button--neutral {
+  background: var(--gray-100-color);
+  color: var(--black-color);
 }
 
 .modal-box {

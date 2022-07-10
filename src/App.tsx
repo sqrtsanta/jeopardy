@@ -23,7 +23,6 @@ interface IJeo {
 }
 
 interface IQuestion {
-  title: string;
   question: string;
   answer: string;
 }
@@ -32,6 +31,11 @@ interface IScore {
   correct: number;
   incorrect: number;
   $: number;
+}
+
+enum IMode {
+  Play,
+  Build,
 }
 
 type IPage =
@@ -229,6 +233,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
           }}
         >
           <JeoBoard
+            mode={IMode.Play}
             selectedIndex={null}
             disabled={incorrectIndexes.concat(correctIndexes)}
             onSelect={(questionIndex) => {
@@ -257,7 +262,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
       {questionIndex != null && (
         <div
           className="mini-modal"
-          style={{ width: "400px", minHeight: "150px" }}
+          style={{ width: "400px", minHeight: "150px", padding: "16px" }}
         >
           <div
             style={{
@@ -365,7 +370,7 @@ function JeoPlayScore({ score }: { score: IScore }) {
     >
       <div>Correct</div>
       <div>Incorrect</div>
-      <div>$$$</div>
+      <div>$</div>
       <div>{score.correct}</div>
       <div>{score.incorrect}</div>
       <div>{score.$}</div>
@@ -450,6 +455,7 @@ function JeoFormPage() {
           }}
         >
           <JeoBoard
+            mode={IMode.Build}
             jeo={jeo}
             disabled={[]}
             selectedIndex={questionIndex}
@@ -559,11 +565,13 @@ const CATEGORIES = [...Array(6).keys()];
 const QUESTIONS = [...Array(30).keys()];
 
 function JeoBoard({
+  mode,
   jeo,
   disabled,
   selectedIndex,
   onSelect,
 }: {
+  mode: IMode;
   jeo: IJeo;
   disabled: number[];
   selectedIndex: number | null;
@@ -571,14 +579,18 @@ function JeoBoard({
 }) {
   return (
     <div className="jeo-board">
+      <JeoTitleCell mode={mode} title={jeo.title} />
       {CATEGORIES.map((categoryIndex) => (
         <JeoHeaderCell
           key={categoryIndex}
+          index={categoryIndex}
+          mode={mode}
           category={jeo.categories[categoryIndex]}
         />
       ))}
       {QUESTIONS.map((questionIndex) => (
         <JeoCell
+          mode={mode}
           key={questionIndex}
           isSelected={selectedIndex === questionIndex}
           isDisabled={disabled.includes(questionIndex)}
@@ -591,7 +603,7 @@ function JeoBoard({
   );
 }
 
-function JeoHeaderCell({ category }: { category: string | undefined }) {
+function JeoTitleCell({ mode, title }: { mode: IMode; title: string }) {
   const { ref, value: fontSize } = useStaticContainerQuery<
     string,
     HTMLDivElement
@@ -606,25 +618,76 @@ function JeoHeaderCell({ category }: { category: string | undefined }) {
   );
 
   return (
-    <div ref={ref} className="jeo-cell">
+    <div
+      ref={ref}
+      className={clsx(
+        "jeo-cell",
+        "jeo-cell--title",
+        mode === IMode.Build && !title && "jeo-cell--empty"
+      )}
+    >
       <div
         style={{
           fontSize,
         }}
       >
-        {category}
+        {title || "Title"}
+      </div>
+    </div>
+  );
+}
+
+function JeoHeaderCell({
+  mode,
+  index,
+  category,
+}: {
+  mode: IMode;
+  index: number;
+  category: string | undefined;
+}) {
+  const { ref, value: fontSize } = useStaticContainerQuery<
+    string,
+    HTMLDivElement
+  >(
+    [
+      buildContainerQuery("12px", 0, 100),
+      buildContainerQuery("14px", 100, 200),
+      buildContainerQuery("16px", 200, 300),
+      buildContainerQuery("18px", 300, 450),
+    ],
+    "20px"
+  );
+
+  return (
+    <div
+      ref={ref}
+      className={clsx(
+        "jeo-cell",
+        "jeo-cell--header",
+        mode === IMode.Build && !category && "jeo-cell--empty"
+      )}
+    >
+      <div
+        style={{
+          fontSize,
+        }}
+      >
+        {category || `Category ${index + 1}`}
       </div>
     </div>
   );
 }
 
 function JeoCell({
+  mode,
   isDisabled,
   isSelected,
   question,
   questionIndex,
   onSelect,
 }: {
+  mode: IMode;
   isDisabled: boolean;
   isSelected: boolean;
   question: IQuestion | undefined;
@@ -651,24 +714,14 @@ function JeoCell({
       className={clsx(
         "jeo-cell",
         isSelected && "jeo-cell--active",
-        isDisabled && "jeo-cell--disabled"
+        isDisabled && "jeo-cell--disabled",
+        mode === IMode.Build &&
+          (question == null || !question.question || !question.answer) &&
+          "jeo-cell--empty"
       )}
       onClick={() => onSelect(questionIndex)}
     >
-      {question?.title ? (
-        <div>
-          <div className="jeo-cell__tiny">${price(questionIndex)}</div>
-          <div
-            style={{
-              fontSize,
-            }}
-          >
-            {question.title}
-          </div>
-        </div>
-      ) : (
-        <div>${price(questionIndex)}</div>
-      )}
+      <div>${price(questionIndex)}</div>
     </button>
   );
 }
@@ -812,11 +865,12 @@ function QuestionForm({
   value: IQuestion | null | undefined;
   onChange(question: IQuestion): void;
 }) {
-  const question = value ?? {
-    title: "",
+  const initialValues = {
     question: "",
     answer: "",
   };
+
+  const question = value ?? initialValues;
 
   const changeField = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -828,6 +882,10 @@ function QuestionForm({
     onChange(nextValue);
   };
 
+  const onClear = () => {
+    onChange(initialValues);
+  };
+
   return (
     <form
       className="form"
@@ -836,16 +894,6 @@ function QuestionForm({
       }}
     >
       <div>Question</div>
-      <div className="field">
-        <input
-          className="input"
-          type="text"
-          placeholder="Title"
-          name="title"
-          value={question.title}
-          onChange={changeField}
-        />
-      </div>
       <div className="field">
         <textarea
           required
@@ -867,6 +915,15 @@ function QuestionForm({
           value={question.answer}
           onChange={changeField}
         />
+      </div>
+      <div className="field">
+        <button
+          type="button"
+          className="button button--neutral"
+          onClick={onClear}
+        >
+          Clear
+        </button>
       </div>
     </form>
   );

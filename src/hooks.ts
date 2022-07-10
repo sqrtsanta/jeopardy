@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useLayoutEffect, useState, useRef } from "react";
 
 export interface Query<T> {
   value: T;
@@ -41,7 +41,7 @@ export const useStaticContainerQuery = <T, E extends Element>(
   const [value, setValue] = useState<T>();
   const ref = useRef<E | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const width = ref.current?.getBoundingClientRect().width ?? 0;
     const calculatedValue = calculateQueryValue(queries, width, defaultValue);
     setValue(calculatedValue);
