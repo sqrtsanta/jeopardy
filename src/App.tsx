@@ -27,10 +27,15 @@ interface IQuestion {
   answer: string;
 }
 
+interface IPlayer {
+  name: string;
+  score: IScore;
+}
+
 interface IScore {
   correct: number;
-  incorrect: number;
   $: number;
+  incorrect: number;
 }
 
 enum IMode {
@@ -204,16 +209,16 @@ function Header() {
 
 function JeoPlay({ jeo }: { jeo: IJeo }) {
   const [questionIndex, setQuestionIndex] = useState<number | null>(null);
-  const [incorrectIndexes, setIncorrectIndexes] = useState<number[]>([]);
-  const [correctIndexes, setCorrectIndexes] = useState<number[]>([]);
+  const [usedIndexes, setUsedIndexes] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [score, setScore] = useState<IScore>({
-    correct: 0,
-    incorrect: 0,
-    $: 0,
-  });
 
   const { closeModal } = useNavigation();
+
+  const onClose = () => {
+    if (questionIndex == null) return;
+    setUsedIndexes((indexes) => indexes.concat(questionIndex));
+    setQuestionIndex(null);
+  };
 
   return (
     <div>
@@ -235,7 +240,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
           <JeoBoard
             mode={IMode.Play}
             selectedIndex={null}
-            disabled={incorrectIndexes.concat(correctIndexes)}
+            disabled={usedIndexes}
             onSelect={(questionIndex) => {
               setQuestionIndex(questionIndex);
             }}
@@ -243,7 +248,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
           />
         </div>
         <div>
-          <JeoPlayScore score={score} />
+          <JeoScoreboard questionIndex={questionIndex} onClose={onClose} />
         </div>
       </div>
       <div
@@ -256,7 +261,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
         }}
       >
         <button type="button" className="button" onClick={closeModal}>
-          Close
+          Exit
         </button>
       </div>
       {questionIndex != null && (
@@ -296,40 +301,10 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
               {isOpen && (
                 <button
                   type="button"
-                  className="button"
-                  onClick={() => {
-                    setCorrectIndexes((indexes) =>
-                      indexes.concat(questionIndex)
-                    );
-                    setScore((score) => ({
-                      ...score,
-                      correct: score.correct + 1,
-                      $: score.$ + price(questionIndex),
-                    }));
-                    setIsOpen(false);
-                    setQuestionIndex(null);
-                  }}
-                >
-                  Mark As Correct
-                </button>
-              )}
-              {isOpen && (
-                <button
-                  type="button"
                   className="button button--delete"
-                  onClick={() => {
-                    setIncorrectIndexes((indexes) =>
-                      indexes.concat(questionIndex)
-                    );
-                    setScore((score) => ({
-                      ...score,
-                      incorrect: score.incorrect + 1,
-                    }));
-                    setIsOpen(false);
-                    setQuestionIndex(null);
-                  }}
+                  onClick={onClose}
                 >
-                  Mark As Incorrect
+                  Continue
                 </button>
               )}
               {!isOpen && (
@@ -341,15 +316,6 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
                   Show Answer
                 </button>
               )}
-              {!isOpen && (
-                <button
-                  type="button"
-                  className="button"
-                  onClick={() => setQuestionIndex(null)}
-                >
-                  Close
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -358,22 +324,134 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
   );
 }
 
-function JeoPlayScore({ score }: { score: IScore }) {
+function JeoScoreboard({
+  questionIndex,
+  onClose,
+}: {
+  questionIndex: number | null;
+  onClose(): void;
+}) {
+  const [players, setPlayers] = useState<IPlayer[]>([
+    {
+      name: "Player 1",
+      score: {
+        correct: 0,
+        $: 0,
+        incorrect: 0,
+      },
+    },
+  ]);
+  const [usedIndexes, setUsedIndexes] = useState<number[]>([]);
+
+  const onCorrect = (playerIndex: number) => {
+    if (questionIndex == null) return;
+    if (usedIndexes.includes(playerIndex)) return;
+    setUsedIndexes([]);
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: {
+                ...item.score,
+                correct: item.score.correct + 1,
+                $: item.score.$ + price(questionIndex),
+              },
+            }
+          : item
+      )
+    );
+    onClose();
+  };
+
+  const onIncorrect = (playerIndex: number) => {
+    if (questionIndex == null) return;
+    if (usedIndexes.includes(playerIndex)) return;
+    setUsedIndexes((usedIndexes) => usedIndexes.concat(playerIndex));
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: { ...item.score, incorrect: item.score.incorrect + 1 },
+            }
+          : item
+      )
+    );
+  };
+
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "8px",
-        fontWeight: 500,
-      }}
-    >
-      <div>Correct</div>
-      <div>Incorrect</div>
-      <div>$</div>
-      <div>{score.correct}</div>
-      <div>{score.incorrect}</div>
-      <div>{score.$}</div>
+    <div className="jeo-scoreboard">
+      {players.map((player, index) => (
+        <JeoPlayer
+          key={index}
+          isActive={!!questionIndex && !usedIndexes.includes(index)}
+          player={player}
+          onCorrect={() => onCorrect(index)}
+          onIncorrect={() => onIncorrect(index)}
+        />
+      ))}
+      <div className="jeo-scoreboard__button-box">
+        <button
+          type="submit"
+          className="button"
+          onClick={() =>
+            setPlayers((players) =>
+              players.concat({
+                name: `Player ${players.length + 1}`,
+                score: {
+                  correct: 0,
+                  $: 0,
+                  incorrect: 0,
+                },
+              })
+            )
+          }
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function JeoPlayer({
+  isActive,
+  player,
+  onCorrect,
+  onIncorrect,
+}: {
+  isActive: boolean;
+  player: IPlayer;
+  onCorrect(): void;
+  onIncorrect(): void;
+}) {
+  return (
+    <div className="jeo-player">
+      <div>{player.name}</div>
+      <div className="jeo-player__score">
+        <div>{player.score.correct}</div>
+        <div>${player.score.$}</div>
+        <div>{player.score.incorrect}</div>
+      </div>
+      <div className="jeo-player__buttons">
+        <button
+          type="button"
+          className="button"
+          disabled={!isActive}
+          onClick={onCorrect}
+        >
+          Yes
+        </button>
+        <button
+          type="button"
+          className="button button--delete"
+          disabled={!isActive}
+          onClick={onIncorrect}
+        >
+          No
+        </button>
+      </div>
     </div>
   );
 }
@@ -502,7 +580,7 @@ function JeoFormPage() {
       >
         <div>
           <button className="button" type="button" onClick={onSubmit}>
-            Save For Later
+            Save
           </button>
         </div>
         <div>
