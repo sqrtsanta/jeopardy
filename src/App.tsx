@@ -4,8 +4,10 @@ import React, {
   useContext,
   useMemo,
   useEffect,
+  useLayoutEffect,
 } from "react";
 import { nanoid } from "nanoid";
+import { get, set, del } from "idb-keyval";
 
 import { buildContainerQuery, useStaticContainerQuery } from "./hooks";
 import "./App.css";
@@ -25,6 +27,8 @@ interface IJeo {
 interface IQuestion {
   question: string;
   answer: string;
+  imageId?: string;
+  audioId?: string;
 }
 
 interface IPlayer {
@@ -141,8 +145,16 @@ function App() {
     [page]
   );
 
+  useLayoutEffect(() => {
+    get("jeos").then((jeos) => {
+      if (jeos != null && jeos.length > 0) {
+        setJeos(jeos);
+      }
+    });
+  }, []);
+
   useEffect(() => {
-    localStorage.setItem("jeos", JSON.stringify(jeos));
+    set("jeos", jeos);
   }, [jeos]);
 
   return (
@@ -285,6 +297,21 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
             >
               {jeo.questions[questionIndex]?.question}
             </div>
+            {jeo.questions[questionIndex]?.imageId && (
+              <div>
+                <ObjectStoreImage
+                  imageId={jeo.questions[questionIndex]?.imageId as string}
+                />
+              </div>
+            )}
+            {jeo.questions[questionIndex]?.audioId && (
+              <div>
+                <ObjectStoreAudio
+                  audioId={jeo.questions[questionIndex]?.audioId as string}
+                  controls
+                />
+              </div>
+            )}
             {isOpen && (
               <div
                 style={{
@@ -943,7 +970,7 @@ function QuestionForm({
   value: IQuestion | null | undefined;
   onChange(question: IQuestion): void;
 }) {
-  const initialValues = {
+  const initialValues: IQuestion = {
     question: "",
     answer: "",
   };
@@ -958,6 +985,27 @@ function QuestionForm({
       [event.target.name]: event.target.value,
     };
     onChange(nextValue);
+  };
+
+  const onSelectFile = (list: FileList | null, key: "imageId" | "audioId") => {
+    const file = list?.[0];
+    if (!file) return;
+    const fileId = nanoid();
+    set(`objects/${fileId}`, file).then(() => {
+      onChange({
+        ...question,
+        [key]: fileId,
+      });
+    });
+  };
+
+  const onClearFile = (id: string | undefined, key: "imageId" | "audioId") => {
+    del(`objects/${id}`).then(() => {
+      onChange({
+        ...question,
+        [key]: undefined,
+      });
+    });
   };
 
   const onClear = () => {
@@ -984,6 +1032,62 @@ function QuestionForm({
         />
       </div>
       <div className="field">
+        {!question.audioId && !question.imageId && (
+          <div style={{ display: "flex", gap: "8px" }}>
+            <label className="file-select">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  onSelectFile(event.target.files, "imageId");
+                }}
+              />
+              <span>+ image</span>
+            </label>
+            <label className="file-select">
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={(event) => {
+                  onSelectFile(event.target.files, "audioId");
+                }}
+              />
+              <span>+ audio</span>
+            </label>
+          </div>
+        )}
+        {question.imageId && (
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div className="file-image">
+              <ObjectStoreImage imageId={question.imageId} />
+            </div>
+            <button
+              className="button button--delete"
+              onClick={() => {
+                onClearFile(question.imageId, "imageId");
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+        {question.audioId && (
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div>
+              <ObjectStoreAudio audioId={question.audioId} controls />
+            </div>
+            <button
+              className="button button--delete"
+              onClick={() => {
+                onClearFile(question.audioId, "audioId");
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+      <div className="field">
         <input
           required
           className="input"
@@ -1005,6 +1109,53 @@ function QuestionForm({
       </div>
     </form>
   );
+}
+
+function useObjectStore({ id }: { id: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useLayoutEffect(() => {
+    let url: string;
+    let unmounted = false;
+
+    get(`objects/${id}`).then((blob) => {
+      if (!unmounted && blob != null) {
+        url = URL.createObjectURL(blob);
+        setUrl(url);
+      }
+    });
+
+    return () => {
+      unmounted = true;
+      URL.revokeObjectURL(url);
+    };
+  }, [id]);
+
+  return url;
+}
+
+function ObjectStoreImage({
+  imageId,
+  ...rest
+}: { imageId: string } & React.DetailedHTMLProps<
+  React.ImgHTMLAttributes<HTMLImageElement>,
+  HTMLImageElement
+>) {
+  const url = useObjectStore({ id: imageId });
+  if (!url) return null;
+  return <img {...rest} src={url} />;
+}
+
+function ObjectStoreAudio({
+  audioId,
+  ...rest
+}: { audioId: string } & React.DetailedHTMLProps<
+  React.AudioHTMLAttributes<HTMLAudioElement>,
+  HTMLAudioElement
+>) {
+  const url = useObjectStore({ id: audioId });
+  if (!url) return null;
+  return <audio {...rest} src={url} />;
 }
 
 export default App;
