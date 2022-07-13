@@ -230,6 +230,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
     if (questionIndex == null) return;
     setUsedIndexes((indexes) => indexes.concat(questionIndex));
     setQuestionIndex(null);
+    setIsOpen(false);
   };
 
   return (
@@ -298,8 +299,19 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
               {jeo.questions[questionIndex]?.question}
             </div>
             {jeo.questions[questionIndex]?.imageId && (
-              <div>
+              <div
+                style={{
+                  maxWidth: "400px",
+                  maxHeight: "400px",
+                }}
+              >
                 <ObjectStoreImage
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                   imageId={jeo.questions[questionIndex]?.imageId as string}
                 />
               </div>
@@ -820,8 +832,7 @@ function JeoCell({
         "jeo-cell",
         isSelected && "jeo-cell--active",
         isDisabled && "jeo-cell--disabled",
-        mode === IMode.Build &&
-          (question == null || !question.question || !question.answer) &&
+        (question == null || !question.question || !question.answer) &&
           "jeo-cell--empty"
       )}
       onClick={() => onSelect(questionIndex)}
