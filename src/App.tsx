@@ -334,6 +334,7 @@ function JeoPlay({ jeo }: { jeo: IJeo }) {
                 {jeo.questions[questionIndex]?.answer}
               </div>
             )}
+            {isOpen && <div>Nobody gave you a correct answer?</div>}
             <div
               style={{ display: "flex", gap: "8px", justifyContent: "center" }}
             >
@@ -381,6 +382,10 @@ function JeoScoreboard({
     },
   ]);
   const [usedIndexes, setUsedIndexes] = useState<number[]>([]);
+
+  useEffect(() => {
+    setUsedIndexes([]);
+  }, [questionIndex]);
 
   const onCorrect = (playerIndex: number) => {
     if (questionIndex == null) return;
