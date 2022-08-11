@@ -5,6 +5,7 @@ import { useNavigation } from "../navigation";
 import { JeoBoard } from "./JeoBoard";
 import { JeoScoreboard } from "./JeoScoreboard";
 import { ObjectStoreAudio, ObjectStoreImage } from "./ObjectStore";
+import { size } from "../helpers";
 
 export function JeoPlay({ jeo }: { jeo: IJeo }) {
   const [questionIndex, setQuestionIndex] = useState<number | null>(null);
@@ -49,6 +50,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
         </div>
         <div>
           <JeoScoreboard
+            size={size(jeo)}
             question={
               questionIndex != null ? jeo.questions[questionIndex] : null
             }

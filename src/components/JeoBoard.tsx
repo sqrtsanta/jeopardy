@@ -1,13 +1,11 @@
-import { type IJeo, type IQuestion, IMode } from "../types";
+import { type IJeo, type IQuestion, IMode, type ISize } from "../types";
 import {
   buildContainerQuery,
   useStaticContainerQuery,
 } from "./useStaticContainerQuery";
 import { clsx } from "../utils/clsx";
-import { price } from "../helpers";
-
-const CATEGORIES = [...Array(6).keys()];
-const QUESTIONS = [...Array(30).keys()];
+import { range } from "../utils/range";
+import { price, size } from "../helpers";
 
 export function JeoBoard({
   mode,
@@ -22,10 +20,18 @@ export function JeoBoard({
   selectedIndex: number | null;
   onSelect(index: number): void;
 }) {
+  const { rows, cols } = size(jeo);
+
   return (
-    <div className="jeo-board">
+    <div
+      className="jeo-board"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `0.7fr 0.7fr repeat(${rows}, 1fr)`,
+      }}
+    >
       <JeoTitleCell mode={mode} title={jeo.title} />
-      {CATEGORIES.map((categoryIndex) => (
+      {range(cols).map((categoryIndex) => (
         <JeoHeaderCell
           key={categoryIndex}
           index={categoryIndex}
@@ -33,10 +39,11 @@ export function JeoBoard({
           category={jeo.categories[categoryIndex]}
         />
       ))}
-      {QUESTIONS.map((questionIndex) => (
+      {range(cols * rows).map((questionIndex) => (
         <JeoCell
-          mode={mode}
           key={questionIndex}
+          size={size(jeo)}
+          mode={mode}
           isSelected={selectedIndex === questionIndex}
           isDisabled={disabled.includes(questionIndex)}
           questionIndex={questionIndex}
@@ -125,6 +132,7 @@ function JeoHeaderCell({
 }
 
 function JeoCell({
+  size,
   mode,
   isDisabled,
   isSelected,
@@ -132,6 +140,7 @@ function JeoCell({
   questionIndex,
   onSelect,
 }: {
+  size: ISize;
   mode: IMode;
   isDisabled: boolean;
   isSelected: boolean;
@@ -165,7 +174,7 @@ function JeoCell({
       )}
       onClick={() => onSelect(questionIndex)}
     >
-      <div>${price(question, questionIndex)}</div>
+      <div>${price(size, question, questionIndex)}</div>
     </button>
   );
 }

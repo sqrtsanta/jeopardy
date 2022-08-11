@@ -1,15 +1,18 @@
 import { nanoid } from "nanoid";
-import { set, del } from "idb-keyval";
+import { set as store, del } from "idb-keyval";
 
-import { type IQuestion } from "../types";
+import { type ISize, type IQuestion } from "../types";
 import { ObjectStoreImage, ObjectStoreAudio } from "./ObjectStore";
 import { price } from "../helpers";
+import { set } from "../utils/set";
 
 export function QuestionForm({
+  size,
   questionIndex,
   value,
   onChange,
 }: {
+  size: ISize;
   questionIndex: number;
   value: IQuestion | null | undefined;
   onChange(question: IQuestion): void;
@@ -24,10 +27,7 @@ export function QuestionForm({
   const changeField = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const nextValue = {
-      ...question,
-      [event.target.name]: event.target.value,
-    };
+    const nextValue = set(event.target.name, event.target.value, question);
     onChange(nextValue);
   };
 
@@ -35,7 +35,7 @@ export function QuestionForm({
     const file = list?.[0];
     if (!file) return;
     const fileId = nanoid();
-    set(`objects/${fileId}`, file).then(() => {
+    store(`objects/${fileId}`, file).then(() => {
       onChange({
         ...question,
         [key]: fileId,
@@ -68,7 +68,7 @@ export function QuestionForm({
         <input
           className="input"
           type="number"
-          placeholder={`Cost: ${price(question, questionIndex)}`}
+          placeholder={`Cost: ${price(size, question, questionIndex)}`}
           name="cost"
           value={question.cost}
           onChange={changeField}

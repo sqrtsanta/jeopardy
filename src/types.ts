@@ -4,10 +4,12 @@ export interface IJeo {
   createdAt: number;
   categories: string[];
   questions: IQuestion[];
-  size?: {
-    rows: number;
-    cols: number;
-  }
+  size?: Partial<ISize>;
+}
+
+export interface ISize {
+  rows: number;
+  cols: number;
 }
 
 export interface IQuestion {

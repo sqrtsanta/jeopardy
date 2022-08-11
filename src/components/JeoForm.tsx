@@ -1,4 +1,5 @@
 import { type IJeo } from "../types";
+import { set } from "../utils/set";
 
 export function JeoForm({
   value,
@@ -10,10 +11,7 @@ export function JeoForm({
   const changeField = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const nextValue = {
-      ...value,
-      [event.target.name]: event.target.value,
-    };
+    const nextValue = set(event.target.name, event.target.value, value);
     onChange(nextValue);
   };
 
@@ -48,6 +46,38 @@ export function JeoForm({
           value={value.title}
           onChange={changeField}
         />
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "8px",
+        }}
+      >
+        <div className="field">
+          <input
+            className="input"
+            type="number"
+            placeholder="Columns: 6"
+            name="size.cols"
+            min={1}
+            max={6}
+            value={value.size?.cols}
+            onChange={changeField}
+          />
+        </div>
+        <div className="field">
+          <input
+            className="input"
+            type="number"
+            placeholder="Rows: 5"
+            name="size.rows"
+            min={1}
+            max={6}
+            value={value.size?.rows}
+            onChange={changeField}
+          />
+        </div>
       </div>
       <div
         style={{

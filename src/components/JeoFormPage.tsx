@@ -7,6 +7,7 @@ import { useJeos } from "./useJeos";
 import { JeoBoard } from "./JeoBoard";
 import { JeoForm } from "./JeoForm";
 import { QuestionForm } from "./QuestionForm";
+import { size } from "../helpers";
 
 export function JeoFormPage() {
   const [jeo, setJeo] = useState<IJeo>({
@@ -93,6 +94,7 @@ export function JeoFormPage() {
           {questionIndex != null && (
             <QuestionForm
               key={questionIndex}
+              size={size(jeo)}
               questionIndex={questionIndex}
               value={jeo.questions[questionIndex]}
               onChange={(question) => {

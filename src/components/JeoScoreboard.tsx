@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 
 import { price } from "../helpers";
-import { type IQuestion, type IPlayer } from "../types";
+import { type IQuestion, type IPlayer, type ISize } from "../types";
 
 export function JeoScoreboard({
+  size,
   question,
   questionIndex,
   onClose,
 }: {
+  size: ISize;
   question: IQuestion | null;
   questionIndex: number | null;
   onClose(): void;
@@ -40,7 +42,7 @@ export function JeoScoreboard({
               score: {
                 ...item.score,
                 correct: item.score.correct + 1,
-                $: item.score.$ + price(question, questionIndex),
+                $: item.score.$ + price(size, question, questionIndex),
               },
             }
           : item
