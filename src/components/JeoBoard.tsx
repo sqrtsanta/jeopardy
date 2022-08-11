@@ -165,7 +165,7 @@ function JeoCell({
       )}
       onClick={() => onSelect(questionIndex)}
     >
-      <div>${price(questionIndex)}</div>
+      <div>${price(question, questionIndex)}</div>
     </button>
   );
 }

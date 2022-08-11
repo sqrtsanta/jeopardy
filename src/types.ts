@@ -4,6 +4,10 @@ export interface IJeo {
   createdAt: number;
   categories: string[];
   questions: IQuestion[];
+  size?: {
+    rows: number;
+    cols: number;
+  }
 }
 
 export interface IQuestion {
@@ -11,6 +15,7 @@ export interface IQuestion {
   answer: string;
   imageId?: string;
   audioId?: string;
+  cost?: number;
 }
 
 export interface IPlayer {

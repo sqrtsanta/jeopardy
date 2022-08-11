@@ -48,7 +48,13 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
           />
         </div>
         <div>
-          <JeoScoreboard questionIndex={questionIndex} onClose={onClose} />
+          <JeoScoreboard
+            question={
+              questionIndex != null ? jeo.questions[questionIndex] : null
+            }
+            questionIndex={questionIndex}
+            onClose={onClose}
+          />
         </div>
       </div>
       <div

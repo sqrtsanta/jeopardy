@@ -93,6 +93,7 @@ export function JeoFormPage() {
           {questionIndex != null && (
             <QuestionForm
               key={questionIndex}
+              questionIndex={questionIndex}
               value={jeo.questions[questionIndex]}
               onChange={(question) => {
                 const nextJeo = {

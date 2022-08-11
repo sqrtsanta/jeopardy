@@ -3,11 +3,14 @@ import { set, del } from "idb-keyval";
 
 import { type IQuestion } from "../types";
 import { ObjectStoreImage, ObjectStoreAudio } from "./ObjectStore";
+import { price } from "../helpers";
 
 export function QuestionForm({
+  questionIndex,
   value,
   onChange,
 }: {
+  questionIndex: number;
   value: IQuestion | null | undefined;
   onChange(question: IQuestion): void;
 }) {
@@ -61,6 +64,16 @@ export function QuestionForm({
       }}
     >
       <div>Question</div>
+      <div className="field">
+        <input
+          className="input"
+          type="number"
+          placeholder={`Cost: ${price(question, questionIndex)}`}
+          name="cost"
+          value={question.cost}
+          onChange={changeField}
+        />
+      </div>
       <div className="field">
         <textarea
           required
