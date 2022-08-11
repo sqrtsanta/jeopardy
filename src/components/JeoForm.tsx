@@ -1,4 +1,6 @@
+import { size } from "../helpers";
 import { type IJeo } from "../types";
+import { range } from "../utils/range";
 import { set } from "../utils/set";
 
 export function JeoForm({
@@ -12,19 +14,6 @@ export function JeoForm({
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const nextValue = set(event.target.name, event.target.value, value);
-    onChange(nextValue);
-  };
-
-  const changeCategory = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ) => {
-    const nextCategories = [...value.categories];
-    nextCategories[index] = event.target.value;
-    const nextValue = {
-      ...value,
-      categories: nextCategories,
-    };
     onChange(nextValue);
   };
 
@@ -86,72 +75,19 @@ export function JeoForm({
           gap: "8px",
         }}
       >
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 1"
-            name="categories.0"
-            value={value.categories[0] ?? ""}
-            onChange={(event) => changeCategory(event, 0)}
-          />
-        </div>
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 2"
-            name="categories.1"
-            value={value.categories[1] ?? ""}
-            onChange={(event) => changeCategory(event, 1)}
-          />
-        </div>
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 3"
-            name="categories.2"
-            value={value.categories[2] ?? ""}
-            onChange={(event) => changeCategory(event, 2)}
-          />
-        </div>
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 4"
-            name="categories.3"
-            value={value.categories[3] ?? ""}
-            onChange={(event) => changeCategory(event, 3)}
-          />
-        </div>
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 5"
-            name="categories.4"
-            value={value.categories[4] ?? ""}
-            onChange={(event) => changeCategory(event, 4)}
-          />
-        </div>
-        <div className="field">
-          <input
-            required
-            className="input"
-            type="text"
-            placeholder="Category 6"
-            name="categories.5"
-            value={value.categories[5] ?? ""}
-            onChange={(event) => changeCategory(event, 5)}
-          />
-        </div>
+        {range(size(value).cols).map((_, index) => (
+          <div className="field" key={index}>
+            <input
+              required
+              className="input"
+              type="text"
+              placeholder={`Category ${index + 1}`}
+              name={`categories.${index}`}
+              value={value.categories[index] ?? ""}
+              onChange={changeField}
+            />
+          </div>
+        ))}
       </div>
       <div className="field"></div>
     </form>
