@@ -17,10 +17,16 @@ function App() {
   return (
     <JeosProvider>
       <NavigationProvider value={navigation}>
-        <Header />
-        <div>
-          <div>{navigation.page.type === NavEnum.Jeos && <JeosPage />}</div>
-          <div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
+          <Header />
+          <div style={{ flexGrow: 1 }}>
+            {navigation.page.type === NavEnum.Jeos && <JeosPage />}
             {navigation.page.type === NavEnum.JeoForm && <JeoFormPage />}
           </div>
         </div>

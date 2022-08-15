@@ -22,10 +22,18 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "100%",
+      }}
+    >
       <div
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
           justifyContent: "center",
           alignItems: "center",
           gap: "16px",
@@ -34,127 +42,143 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
       >
         <div
           style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            gap: "16px",
+            padding: "16px",
+          }}
+        >
+          <button
+            type="button"
+            className="button button--delete"
+            onClick={closeModal}
+          >
+            Exit
+          </button>
+        </div>
+        <div
+          style={{
             width: "700px",
             height: "550px",
           }}
         >
-          <JeoBoard
-            mode={IMode.Play}
-            selectedIndex={null}
-            disabled={usedIndexes}
-            onSelect={(questionIndex) => {
-              setQuestionIndex(questionIndex);
-            }}
-            jeo={jeo}
-          />
-        </div>
-        <div>
-          <JeoScoreboard
-            size={size(jeo)}
-            question={
-              questionIndex != null ? jeo.questions[questionIndex] : null
-            }
-            questionIndex={questionIndex}
-            onClose={onClose}
-          />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "16px",
-          padding: "16px",
-        }}
-      >
-        <button type="button" className="button" onClick={closeModal}>
-          Exit
-        </button>
-      </div>
-      {questionIndex != null && (
-        <div
-          className="mini-modal"
-          style={{ minWidth: "400px", minHeight: "150px", padding: "16px" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              textAlign: "center",
-            }}
-          >
+          {questionIndex != null ? (
             <div
               style={{
-                fontSize: "24px",
-                fontWeight: "700",
+                border: "1px solid black",
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px",
+                textAlign: "center",
+                justifyContent: "center",
+                height: "100%",
+                borderRadius: "6px",
               }}
             >
-              {jeo.questions[questionIndex]?.question}
-            </div>
-            {jeo.questions[questionIndex]?.imageId && (
               <div
                 style={{
-                  maxWidth: "80vh",
-                  maxHeight: "80vh",
-                }}
-              >
-                <ObjectStoreImage
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                  imageId={jeo.questions[questionIndex]?.imageId as string}
-                />
-              </div>
-            )}
-            {jeo.questions[questionIndex]?.audioId && (
-              <div>
-                <ObjectStoreAudio
-                  audioId={jeo.questions[questionIndex]?.audioId as string}
-                  controls
-                />
-              </div>
-            )}
-            {isOpen && (
-              <div
-                style={{
-                  fontSize: "24px",
+                  fontSize: "20px",
                   fontWeight: "700",
                 }}
               >
-                {jeo.questions[questionIndex]?.answer}
+                {jeo.questions[questionIndex]?.question}
               </div>
-            )}
-            {isOpen && <div>Nobody gave you a correct answer?</div>}
-            <div
-              style={{ display: "flex", gap: "8px", justifyContent: "center" }}
-            >
+              {jeo.questions[questionIndex]?.imageId && (
+                <div
+                  className="scrollbar"
+                  style={{
+                    overflowY: "auto",
+                    flexShrink: "1",
+                    minHeight: "0",
+                  }}
+                >
+                  <ObjectStoreImage
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      objectFit: "cover",
+                    }}
+                    imageId={jeo.questions[questionIndex]?.imageId as string}
+                  />
+                </div>
+              )}
+              {jeo.questions[questionIndex]?.audioId && (
+                <div>
+                  <ObjectStoreAudio
+                    audioId={jeo.questions[questionIndex]?.audioId as string}
+                    controls
+                  />
+                </div>
+              )}
               {isOpen && (
-                <button
-                  type="button"
-                  className="button button--delete"
-                  onClick={onClose}
+                <div
+                  style={{
+                    fontSize: "28px",
+                    fontWeight: "700",
+                  }}
                 >
-                  Continue
-                </button>
+                  {jeo.questions[questionIndex]?.answer}
+                </div>
               )}
-              {!isOpen && (
-                <button
-                  type="button"
-                  className="button"
-                  onClick={() => setIsOpen(true)}
+              <div>
+                {isOpen && (
+                  <div style={{ fontSize: "14px", marginBottom: "6px" }}>
+                    Nobody gave you a correct answer?
+                  </div>
+                )}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    justifyContent: "center",
+                  }}
                 >
-                  Show Answer
-                </button>
-              )}
+                  {isOpen && (
+                    <button
+                      type="button"
+                      className="button button--delete"
+                      onClick={onClose}
+                    >
+                      Continue
+                    </button>
+                  )}
+                  {!isOpen && (
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() => setIsOpen(true)}
+                    >
+                      Show Answer
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <JeoBoard
+              mode={IMode.Play}
+              selectedIndex={null}
+              disabled={usedIndexes}
+              onSelect={(questionIndex) => {
+                setQuestionIndex(questionIndex);
+              }}
+              jeo={jeo}
+            />
+          )}
         </div>
-      )}
+        <div />
+      </div>
+      <div>
+        <JeoScoreboard
+          size={size(jeo)}
+          question={questionIndex != null ? jeo.questions[questionIndex] : null}
+          questionIndex={questionIndex}
+          onClose={onClose}
+        />
+      </div>
     </div>
   );
 }

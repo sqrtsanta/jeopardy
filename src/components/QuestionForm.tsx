@@ -126,7 +126,14 @@ export function QuestionForm({
           </div>
         )}
         {question.audioId && (
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
               <ObjectStoreAudio audioId={question.audioId} controls />
             </div>

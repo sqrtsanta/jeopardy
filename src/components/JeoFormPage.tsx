@@ -56,16 +56,56 @@ export function JeoFormPage() {
   };
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        height: "100%",
+      }}
+    >
       <div
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
           justifyContent: "center",
           alignItems: "center",
           gap: "16px",
           padding: "16px",
         }}
       >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column",
+            gap: "16px",
+            padding: "16px",
+          }}
+        >
+          <div>
+            <button className="button" type="button" onClick={onSubmit}>
+              Save & Exit
+            </button>
+          </div>
+          <div>
+            <button className="button" type="button" onClick={onPlay}>
+              Play
+            </button>
+          </div>
+          {page.jeoId && (
+            <div>
+              <button
+                className="button button--delete"
+                type="button"
+                onClick={onDestroy}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
         <div
           style={{
             width: "700px",
@@ -110,37 +150,6 @@ export function JeoFormPage() {
             />
           )}
         </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "16px",
-          padding: "16px",
-        }}
-      >
-        <div>
-          <button className="button" type="button" onClick={onSubmit}>
-            Save
-          </button>
-        </div>
-        <div>
-          <button className="button" type="button" onClick={onPlay}>
-            Play
-          </button>
-        </div>
-        {page.jeoId && (
-          <div>
-            <button
-              className="button button--delete"
-              type="button"
-              onClick={onDestroy}
-            >
-              Delete
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
