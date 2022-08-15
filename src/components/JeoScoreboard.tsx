@@ -72,7 +72,7 @@ export function JeoScoreboard({
       {players.map((player, index) => (
         <JeoPlayer
           key={index}
-          isActive={!!questionIndex && !usedIndexes.includes(index)}
+          isActive={questionIndex != null && !usedIndexes.includes(index)}
           player={player}
           onCorrect={() => onCorrect(index)}
           onIncorrect={() => onIncorrect(index)}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { nanoid } from "nanoid";
 
 import { type IJeo, IMode } from "../types";
@@ -28,7 +28,7 @@ export function JeoFormPage() {
 
   const existingJeo = jeos.find((item) => item.id === page.jeoId);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (existingJeo) {
       setJeo(existingJeo);
     }
