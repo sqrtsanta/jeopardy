@@ -1,5 +1,6 @@
 :root {
   --color-blue: hsl(241, 72%, 37%);
+  --color-dark-blue: hsl(241, 46%, 16%);
   --color-gold: hsl(43, 100%, 71%);
   --color-red: hsl(347, 63%, 53%);
   --color-black: hsl(0, 0%, 0%);
@@ -10,7 +11,8 @@ html,
 body,
 #root {
   height: 100%;
-  background-image: linear-gradient(-45deg, #23a6d5, #23d5ab);
+  background-color: var(--color-dark-blue);
+  color: white;
 }
 
 .scrollbar::-webkit-scrollbar {
@@ -49,6 +51,7 @@ body,
   font-weight: 700;
   letter-spacing: 2px;
   cursor: pointer;
+  color: inherit;
 }
 
 .jeo-item-list {
@@ -239,6 +242,15 @@ body,
   opacity: 0.7;
 }
 
+.button--ghost {
+  background: transparent;
+  color: white;
+  height: revert;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+}
+
 .button--delete {
   background: var(--color-red);
   color: white;
@@ -255,7 +267,7 @@ body,
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(-45deg, #23a6d5, #23d5ab);
+  background-color: var(--color-dark-blue);
 }
 
 .modal-content {
@@ -266,19 +278,6 @@ body,
   width: 100%;
   height: 100%;
   border-radius: 8px;
-}
-
-.mini-modal {
-  background: rgba(255, 255, 255);
-  border-radius: 8px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
 .file-select {

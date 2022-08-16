@@ -10,6 +10,24 @@ export function price(size: ISize, question: IQuestion | null | undefined, quest
   return defaultPrice
 }
 
+export function min(jeo: IJeo) {
+  let toReturn = Infinity;
+
+  for (let i = 0; i < jeo.questions.length; i += 1) {
+    let current = price(size(jeo), jeo.questions[i], i);
+
+    if (current < toReturn) {
+      toReturn = current;
+    }
+  }
+
+  if (toReturn === Infinity) {
+    toReturn = 100;
+  }
+
+  return toReturn;
+}
+
 export function size(jeo: IJeo) {
   let cols = 6;
   let rows = 5;

@@ -24,7 +24,7 @@ export function JeoForm({
         event.preventDefault();
       }}
     >
-      <div>Jeo</div>
+      <div>Main</div>
       <div className="field">
         <input
           required

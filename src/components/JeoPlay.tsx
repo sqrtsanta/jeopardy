@@ -1,24 +1,146 @@
 import { useState } from "react";
 
-import { type IJeo, IMode } from "../types";
+import { type IJeo, IMode, type IPlayer } from "../types";
 import { useNavigation } from "../navigation";
 import { JeoBoard } from "./JeoBoard";
 import { JeoScoreboard } from "./JeoScoreboard";
 import { ObjectStoreAudio, ObjectStoreImage } from "./ObjectStore";
-import { size } from "../helpers";
+import { size, price, min } from "../helpers";
 
 export function JeoPlay({ jeo }: { jeo: IJeo }) {
-  const [questionIndex, setQuestionIndex] = useState<number | null>(null);
-  const [usedIndexes, setUsedIndexes] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [questionIndex, setQuestionIndex] = useState<number | null>(null);
+  const [usedQuestionsIndexes, setUsedQuestionsIndexes] = useState<number[]>(
+    []
+  );
+  const [usedPlayersIndexes, setUsedPlayersIndexes] = useState<number[]>([]);
+  const [players, setPlayers] = useState<IPlayer[]>([
+    {
+      name: "Player 1",
+      score: {
+        correct: 0,
+        $: 0,
+        incorrect: 0,
+      },
+    },
+  ]);
 
   const { closeModal } = useNavigation();
 
+  const onReset = () => {
+    setQuestionIndex(null);
+    setUsedQuestionsIndexes([]);
+    setUsedPlayersIndexes([]);
+    setIsOpen(false);
+    setPlayers((players) =>
+      players.map((player) => ({
+        ...player,
+        score: { correct: 0, $: 0, incorrect: 0 },
+      }))
+    );
+  };
+
   const onClose = () => {
     if (questionIndex == null) return;
-    setUsedIndexes((indexes) => indexes.concat(questionIndex));
+    setUsedQuestionsIndexes((indexes) => indexes.concat(questionIndex));
+    setUsedPlayersIndexes([]);
     setQuestionIndex(null);
     setIsOpen(false);
+  };
+
+  const onCorrect = (playerIndex: number) => {
+    if (questionIndex == null) return;
+    if (usedPlayersIndexes.includes(playerIndex)) return;
+    setUsedPlayersIndexes([]);
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: {
+                ...item.score,
+                correct: item.score.correct + 1,
+                $:
+                  item.score.$ +
+                  price(size(jeo), jeo.questions[questionIndex], questionIndex),
+              },
+            }
+          : item
+      )
+    );
+    onClose();
+  };
+
+  const onIncorrect = (playerIndex: number) => {
+    if (questionIndex == null) return;
+    if (usedPlayersIndexes.includes(playerIndex)) return;
+    setUsedPlayersIndexes((usedPlayersIndexes) =>
+      usedPlayersIndexes.concat(playerIndex)
+    );
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: {
+                ...item.score,
+                incorrect: item.score.incorrect + 1,
+                $: Math.max(
+                  item.score.$ -
+                    price(
+                      size(jeo),
+                      jeo.questions[questionIndex],
+                      questionIndex
+                    ),
+                  0
+                ),
+              },
+            }
+          : item
+      )
+    );
+  };
+
+  const onIncrement = (playerIndex: number) => {
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: { ...item.score, $: item.score.$ + min(jeo) / 2 },
+            }
+          : item
+      )
+    );
+  };
+
+  const onDecrement = (playerIndex: number) => {
+    setPlayers((players) =>
+      players.map((item, index) =>
+        index === playerIndex
+          ? {
+              ...item,
+              score: {
+                ...item.score,
+                $: Math.max(item.score.$ - min(jeo) / 2, 0),
+              },
+            }
+          : item
+      )
+    );
+  };
+
+  const onAdd = () => {
+    setPlayers((players) =>
+      players.concat({
+        name: `Player ${players.length + 1}`,
+        score: {
+          correct: 0,
+          $: 0,
+          incorrect: 0,
+        },
+      })
+    );
   };
 
   return (
@@ -50,6 +172,9 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
             padding: "16px",
           }}
         >
+          <button type="button" className="button" onClick={onReset}>
+            Reset
+          </button>
           <button
             type="button"
             className="button button--delete"
@@ -67,7 +192,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
           {questionIndex != null ? (
             <div
               style={{
-                border: "1px solid black",
+                border: "2px solid black",
                 padding: "16px",
                 display: "flex",
                 flexDirection: "column",
@@ -161,9 +286,10 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
             <JeoBoard
               mode={IMode.Play}
               selectedIndex={null}
-              disabled={usedIndexes}
+              disabled={usedQuestionsIndexes}
               onSelect={(questionIndex) => {
                 setQuestionIndex(questionIndex);
+                setUsedPlayersIndexes([]);
               }}
               jeo={jeo}
             />
@@ -173,10 +299,14 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
       </div>
       <div>
         <JeoScoreboard
-          size={size(jeo)}
-          question={questionIndex != null ? jeo.questions[questionIndex] : null}
           questionIndex={questionIndex}
-          onClose={onClose}
+          players={players}
+          usedPlayersIndexes={usedPlayersIndexes}
+          onCorrect={onCorrect}
+          onIncorrect={onIncorrect}
+          onIncrement={onIncrement}
+          onDecrement={onDecrement}
+          onAdd={onAdd}
         />
       </div>
     </div>
