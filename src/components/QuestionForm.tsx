@@ -52,10 +52,6 @@ export function QuestionForm({
     });
   };
 
-  const onClear = () => {
-    onChange(initialValues);
-  };
-
   return (
     <form
       className="form"
@@ -158,15 +154,6 @@ export function QuestionForm({
           value={question.answer}
           onChange={changeField}
         />
-      </div>
-      <div className="field">
-        <button
-          type="button"
-          className="button button--neutral"
-          onClick={onClear}
-        >
-          Clear
-        </button>
       </div>
     </form>
   );

@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-icons": "^1.1.1",
     "idb-keyval": "^6.2.0",
     "nanoid": "^4.0.0",
     "react": "^18.0.0",

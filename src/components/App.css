@@ -235,6 +235,10 @@ body,
   font-weight: 700;
   padding: 6px 12px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
 }
 
 .button:disabled {
@@ -293,6 +297,7 @@ body,
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
+  color: black;
 }
 
 .file-select > input {

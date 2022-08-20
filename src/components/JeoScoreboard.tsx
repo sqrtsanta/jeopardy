@@ -1,3 +1,5 @@
+import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
+
 import { type IPlayer } from "../types";
 
 export function JeoScoreboard({
@@ -36,6 +38,7 @@ export function JeoScoreboard({
       ))}
       <div className="jeo-scoreboard__button-box">
         <button type="submit" className="button" onClick={onAdd}>
+          <PlusIcon />
           Add
         </button>
       </div>
@@ -67,7 +70,7 @@ function JeoPlayer({
           className="button button--ghost"
           onClick={onIncrement}
         >
-          +
+          <PlusIcon />
         </button>
         <div>${player.score.$}</div>
         <button
@@ -75,7 +78,7 @@ function JeoPlayer({
           className="button button--ghost"
           onClick={onDecrement}
         >
-          -
+          <MinusIcon />
         </button>
       </div>
       <div className="jeo-player__buttons">

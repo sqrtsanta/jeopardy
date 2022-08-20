@@ -1,5 +1,10 @@
 import { useState, useLayoutEffect } from "react";
 import { nanoid } from "nanoid";
+import {
+  CrumpledPaperIcon,
+  ArrowLeftIcon,
+  MixIcon,
+} from "@radix-ui/react-icons";
 
 import { type IJeo, IMode } from "../types";
 import { NavEnum, useNavigation } from "../navigation";
@@ -86,11 +91,13 @@ export function JeoFormPage() {
         >
           <div>
             <button className="button" type="button" onClick={onSubmit}>
+              <ArrowLeftIcon />
               Save & Exit
             </button>
           </div>
           <div>
             <button className="button" type="button" onClick={onPlay}>
+              <MixIcon />
               Play
             </button>
           </div>
@@ -101,6 +108,7 @@ export function JeoFormPage() {
                 type="button"
                 onClick={onDestroy}
               >
+                <CrumpledPaperIcon />
                 Delete
               </button>
             </div>

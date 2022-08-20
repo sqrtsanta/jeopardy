@@ -1,3 +1,5 @@
+import { PlusIcon } from "@radix-ui/react-icons";
+
 import { useJeos } from "./useJeos";
 import { type IJeo } from "../types";
 import { NavEnum, useNavigation } from "../navigation";
@@ -26,7 +28,17 @@ function JeoItemNew() {
         className="overlay-button"
         onClick={() => go({ type: NavEnum.JeoForm })}
       >
-        + New
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.2rem",
+          }}
+        >
+          <PlusIcon />
+          New
+        </div>
       </button>
     </div>
   );

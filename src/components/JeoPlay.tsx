@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeftIcon, SymbolIcon } from "@radix-ui/react-icons";
 
 import { type IJeo, IMode, type IPlayer } from "../types";
 import { useNavigation } from "../navigation";
@@ -182,6 +183,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
           }}
         >
           <button type="button" className="button" onClick={onReset}>
+            <SymbolIcon />
             Reset
           </button>
           <button
@@ -189,6 +191,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
             className="button button--delete"
             onClick={closeModal}
           >
+            <ArrowLeftIcon />
             Exit
           </button>
         </div>
