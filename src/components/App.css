@@ -140,12 +140,14 @@ body,
 
 .jeo-scoreboard {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 16px;
 }
 
 .jeo-player {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -223,6 +225,27 @@ body,
   height: 100%;
   width: 100%;
   cursor: pointer;
+}
+
+.unstyled-button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.unstyled-input {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0;
 }
 
 .button {

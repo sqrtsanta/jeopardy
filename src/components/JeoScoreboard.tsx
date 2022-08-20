@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PlusIcon, MinusIcon } from "@radix-ui/react-icons";
 
 import { type IPlayer } from "../types";
@@ -10,6 +11,7 @@ export function JeoScoreboard({
   onIncorrect,
   onIncrement,
   onDecrement,
+  onEdit,
   onAdd,
 }: {
   questionIndex: number | null;
@@ -19,6 +21,7 @@ export function JeoScoreboard({
   onIncorrect(index: number): void;
   onIncrement(index: number): void;
   onDecrement(index: number): void;
+  onEdit(index: number, name: string): void;
   onAdd(): void;
 }) {
   return (
@@ -34,6 +37,7 @@ export function JeoScoreboard({
           onIncorrect={() => onIncorrect(index)}
           onIncrement={() => onIncrement(index)}
           onDecrement={() => onDecrement(index)}
+          onEdit={(name) => onEdit(index, name)}
         />
       ))}
       <div className="jeo-scoreboard__button-box">
@@ -53,6 +57,7 @@ function JeoPlayer({
   onIncorrect,
   onIncrement,
   onDecrement,
+  onEdit,
 }: {
   isActive: boolean;
   player: IPlayer;
@@ -60,10 +65,35 @@ function JeoPlayer({
   onIncorrect(): void;
   onIncrement(): void;
   onDecrement(): void;
+  onEdit(name: string): void;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+
   return (
     <div className="jeo-player">
-      <div>{player.name}</div>
+      {isEditing ? (
+        <input
+          size={1}
+          autoFocus
+          style={{
+            textAlign: "center",
+          }}
+          className="unstyled-input"
+          value={player.name ?? ""}
+          onChange={(event) => onEdit(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              setIsEditing(false);
+            }
+          }}
+          onBlur={() => setIsEditing(false)}
+        />
+      ) : (
+        <button className="unstyled-button" onClick={() => setIsEditing(true)}>
+          {player.name}
+        </button>
+      )}
+
       <div className="jeo-player__score">
         <button
           type="button"

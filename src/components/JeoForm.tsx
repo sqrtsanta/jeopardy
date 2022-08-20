@@ -32,7 +32,7 @@ export function JeoForm({
           type="text"
           placeholder="Title"
           name="title"
-          value={value.title}
+          value={value.title ?? ""}
           onChange={changeField}
         />
       </div>
@@ -51,7 +51,7 @@ export function JeoForm({
             name="size.cols"
             min={1}
             max={6}
-            value={value.size?.cols}
+            value={value.size?.cols ?? ""}
             onChange={changeField}
           />
         </div>
@@ -63,7 +63,7 @@ export function JeoForm({
             name="size.rows"
             min={1}
             max={6}
-            value={value.size?.rows}
+            value={value.size?.rows ?? ""}
             onChange={changeField}
           />
         </div>

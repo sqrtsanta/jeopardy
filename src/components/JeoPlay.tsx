@@ -147,6 +147,14 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
     );
   };
 
+  const onEdit = (editIndex: number, editName: string) => {
+    setPlayers((players) =>
+      players.map((player, index) =>
+        index === editIndex ? { ...player, name: editName } : player
+      )
+    );
+  };
+
   const onSelect = (questionIndex: number) => {
     setQuestionIndex(questionIndex);
     setUsedPlayersIndexes([]);
@@ -315,6 +323,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
           onIncorrect={onIncorrect}
           onIncrement={onIncrement}
           onDecrement={onDecrement}
+          onEdit={onEdit}
           onAdd={onAdd}
         />
       </div>
