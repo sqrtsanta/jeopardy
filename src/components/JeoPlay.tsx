@@ -6,6 +6,7 @@ import { JeoBoard } from "./JeoBoard";
 import { JeoScoreboard } from "./JeoScoreboard";
 import { ObjectStoreAudio, ObjectStoreImage } from "./ObjectStore";
 import { size, price, min } from "../helpers";
+import { sound } from "../sound";
 
 export function JeoPlay({ jeo }: { jeo: IJeo }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +52,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
   const onCorrect = (playerIndex: number) => {
     if (questionIndex == null) return;
     if (usedPlayersIndexes.includes(playerIndex)) return;
+    sound.correct();
     setUsedPlayersIndexes([]);
     setPlayers((players) =>
       players.map((item, index) =>
@@ -74,6 +76,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
   const onIncorrect = (playerIndex: number) => {
     if (questionIndex == null) return;
     if (usedPlayersIndexes.includes(playerIndex)) return;
+    sound.incorrect();
     setUsedPlayersIndexes((usedPlayersIndexes) =>
       usedPlayersIndexes.concat(playerIndex)
     );
@@ -141,6 +144,12 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
         },
       })
     );
+  };
+
+  const onSelect = (questionIndex: number) => {
+    setQuestionIndex(questionIndex);
+    setUsedPlayersIndexes([]);
+    sound.timeIsTicking();
   };
 
   return (
@@ -287,10 +296,7 @@ export function JeoPlay({ jeo }: { jeo: IJeo }) {
               mode={IMode.Play}
               selectedIndex={null}
               disabled={usedQuestionsIndexes}
-              onSelect={(questionIndex) => {
-                setQuestionIndex(questionIndex);
-                setUsedPlayersIndexes([]);
-              }}
+              onSelect={onSelect}
               jeo={jeo}
             />
           )}
