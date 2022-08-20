@@ -29,6 +29,7 @@ export function JeoScoreboard({
       {players.map((player, index) => (
         <JeoPlayer
           key={index}
+          index={index}
           isActive={
             questionIndex != null && !usedPlayersIndexes.includes(index)
           }
@@ -51,6 +52,7 @@ export function JeoScoreboard({
 }
 
 function JeoPlayer({
+  index,
   isActive,
   player,
   onCorrect,
@@ -59,6 +61,7 @@ function JeoPlayer({
   onDecrement,
   onEdit,
 }: {
+  index: number;
   isActive: boolean;
   player: IPlayer;
   onCorrect(): void;
@@ -83,10 +86,18 @@ function JeoPlayer({
           onChange={(event) => onEdit(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
+              if (event.target.value === "") {
+                onEdit(`Player ${index + 1}`);
+              }
               setIsEditing(false);
             }
           }}
-          onBlur={() => setIsEditing(false)}
+          onBlur={(event) => {
+            if (event.target.value === "") {
+              onEdit(`Player ${index + 1}`);
+            }
+            setIsEditing(false);
+          }}
         />
       ) : (
         <button className="unstyled-button" onClick={() => setIsEditing(true)}>
