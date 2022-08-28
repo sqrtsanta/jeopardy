@@ -37,7 +37,7 @@ export function JeosProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  const { clearFile } = useObjectForm();
+  const { clearFiles } = useObjectForm();
 
   useLayoutEffect(() => {
     get("jeos").then((jeos) => {
@@ -59,15 +59,12 @@ export function JeosProvider({ children }: { children: ReactNode }) {
       setJeos((jeos) => jeos.map((item) => (item.id === jeo.id ? jeo : item)));
     };
     const destroy = (jeo: IJeo) => {
-      jeo.questions.forEach((question) => {
-        if (question != null && question.audioId != null) {
-          clearFile(question.audioId);
-        }
-
-        if (question != null && question.imageId != null) {
-          clearFile(question.imageId);
-        }
-      });
+      clearFiles(
+        jeo.questions.flatMap((question) => [
+          question.audioId,
+          question.imageId,
+        ])
+      );
 
       setJeos((jeos) => jeos.filter((item) => item.id !== jeo.id));
     };

@@ -1,5 +1,5 @@
 import { useState, useLayoutEffect } from "react";
-import { set, del, get } from "idb-keyval";
+import { set, del, delMany, get } from "idb-keyval";
 import { nanoid } from "nanoid";
 
 export function useObjectForm() {
@@ -13,12 +13,20 @@ export function useObjectForm() {
   };
 
   const clearFile = (id: string | undefined) => {
+    if (id == null) {
+      return Promise.resolve();
+    }
     return del(`objects/${id}`);
   };
+
+  const clearFiles = (ids: Array<string | undefined>) => {
+    return delMany(ids.filter(id => id != null).map((id) => `objects/${id}`));
+  }
 
   return {
     selectFile,
     clearFile,
+    clearFiles,
   }
 }
 
