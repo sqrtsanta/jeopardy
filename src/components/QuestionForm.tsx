@@ -1,10 +1,9 @@
-import { nanoid } from "nanoid";
-import { set as store, del } from "idb-keyval";
-
 import { type ISize, type IQuestion } from "../types";
 import { ObjectStoreImage, ObjectStoreAudio } from "./ObjectStore";
 import { price } from "../helpers";
 import { set } from "../utils/set";
+import { noop } from "../utils/noop";
+import { useObjectForm } from "./useObjectStore";
 
 export function QuestionForm({
   size,
@@ -31,25 +30,28 @@ export function QuestionForm({
     onChange(nextValue);
   };
 
+  const { selectFile, clearFile } = useObjectForm();
+
   const onSelectFile = (list: FileList | null, key: "imageId" | "audioId") => {
-    const file = list?.[0];
-    if (!file) return;
-    const fileId = nanoid();
-    store(`objects/${fileId}`, file).then(() => {
-      onChange({
-        ...question,
-        [key]: fileId,
-      });
-    });
+    selectFile(list)
+      .then((fileId) => {
+        onChange({
+          ...question,
+          [key]: fileId,
+        });
+      })
+      .catch(noop);
   };
 
   const onClearFile = (id: string | undefined, key: "imageId" | "audioId") => {
-    del(`objects/${id}`).then(() => {
-      onChange({
-        ...question,
-        [key]: undefined,
-      });
-    });
+    clearFile(id)
+      .then(() => {
+        onChange({
+          ...question,
+          [key]: undefined,
+        });
+      })
+      .catch(noop);
   };
 
   return (
